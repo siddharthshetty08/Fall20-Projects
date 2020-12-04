@@ -4,6 +4,7 @@
 
 from math import inf as infinity
 import random
+import copy
 human = -1
 bot = 1
 class FirstCaptureGo:
@@ -152,8 +153,74 @@ def print_board(board):
         row = ["W" if x == 0 else x for x in row]
         print(row)
 
+def smart_play(board, is_black):
+    groups = get_groups(board, not is_black)
+    possible_attack = []
+    for group in groups:
+        for co_ord in group:
+            neighbours = find_adjacent_cells(co_ord[0], co_ord[1], len(board))
+            for neighbour in neighbours:
+                if board[neighbour[0]][neighbour[1]] == -1:
+                    if is_black:
+                        board[neighbour[0]][neighbour[1]] = 1
+                    else:
+                        board[neighbour[0]][neighbour[1]] = 0
+                    if not winning_move(board, not is_black):
+                        possible_attack.append([neighbour[0],neighbour[1]])
+                        if len(possible_attack)==3:
+                            return possible_attack
+                    board[neighbour[0]][neighbour[1]] = -1
+
+    #print("smart_play")
+    return possible_attack
+
+def randomized_moves(board , count, game_object):
+    possible_moves = empty_cells(board)
+    turn = 1
+    while count > 0 and possible_moves:
+        # i = random.randint(0, len(possible_moves) - 1)
+        # x, y = possible_moves.pop(i)
+        if turn == 1:
+            # possible_attack = smart_play(board, game_object.bot)
+            # if possible_attack:
+            #     i = random.randint(0, len(possible_attack) - 1)
+            #     x,y = possible_attack[i]
+            #     possible_moves.remove(possible_attack[i])
+            # else:
+            i = random.randint(0, len(possible_moves) - 1)
+            x, y = possible_moves.pop(i)
+
+            if game_object.bot:
+                board[x][y] = 1
+            else:
+                board[x][y] = 0
+            turn = 2
+            count -= 1
+            continue
+        else:
+            #possible_attack = smart_play(board, game_object.human)
+            # if possible_attack:
+            #     i = random.randint(0, len(possible_attack) - 1)
+            #     x, y = possible_attack[i]
+            #     possible_moves.remove(possible_attack[i])
+            # else:
+            i = random.randint(0, len(possible_moves) - 1)
+            x, y = possible_moves.pop(i)
+
+            if game_object.human:
+                board[x][y] = 1
+            else:
+                board[x][y] = 0
+            turn = 1
+            count -= 1
+            continue
+    return board
+
+
 
 def evaluate(game_object):
+    board = copy.deepcopy(game_object.board)
+    board = randomized_moves(board, len(empty_cells(board)) ,game_object)
     if winning_move(game_object.board, game_object.bot):
         score = 1
     elif winning_move(game_object.board, game_object.human):
@@ -329,7 +396,7 @@ def play_fcg_cvh(side_len):
                             break
                 else:
                     # best_move = minimax(game_object,len(empty_cells(game_object.board)),bot)
-                    best_move = minimax(game_object, len(empty_cells(game_object.board)), bot, -infinity, infinity)
+                    best_move = minimax(game_object, 5, bot, -infinity, infinity)
                     x, y = best_move[0], best_move[1]
                 game_object.board[x][y] = 1
                 game_object.visited[x][y] = 1
@@ -359,7 +426,7 @@ def play_fcg_cvh(side_len):
                 turn = 1
             else:
                 print("Bot's Turn")
-                best_move = minimax(game_object, len(empty_cells(game_object.board)) , bot, -infinity, infinity)
+                best_move = minimax(game_object, 5 , bot, -infinity, infinity)
                 x, y = best_move[0], best_move[1]
                 game_object.board[x][y] = 0
                 game_object.visited[x][y] = 1
