@@ -21,7 +21,7 @@ class FirstCaptureGo:
         """
         self.board = []
         self.visited = []
-        self.prior_states = []
+        #self.prior_states = []
         for i in range(side_len):
             self.board.append([])
             self.visited.append([])
@@ -205,13 +205,14 @@ def randomized_moves(board , count, game_object):
             # else:
             i = random.randint(0, len(possible_moves) - 1)
             x, y = possible_moves.pop(i)
-
             if game_object.bot:
                 board[x][y] = 1
             else:
                 board[x][y] = 0
             turn = 2
             count -= 1
+            if game_over(board):
+                break
             continue
         else:
             #possible_attack = smart_play(board, game_object.human)
@@ -222,15 +223,17 @@ def randomized_moves(board , count, game_object):
             # else:
             i = random.randint(0, len(possible_moves) - 1)
             x, y = possible_moves.pop(i)
-
             if game_object.human:
                 board[x][y] = 1
             else:
                 board[x][y] = 0
             turn = 1
             count -= 1
+            if game_over(board):
+                break
             continue
     return board
+
 
 def evaluate(game_object):
     """
@@ -271,7 +274,7 @@ def empty_cells(board):
                 empty_cells.append([x, y])
     return empty_cells
 
-def minimax(game_object, depth, player, alpha, beta, score):
+def minimax(game_object, depth, player, alpha, beta):
     """
     Evaluates the best move based on the minimax algorithm. Alpha beta pruning is implemented to improve the performance of the code
     :param game_object Class instance: Current game instance
@@ -287,7 +290,7 @@ def minimax(game_object, depth, player, alpha, beta, score):
         best = [-1, -1, +infinity]
 
     if depth == 0 or game_over(game_object.board):
-        score += evaluate(game_object)
+        score = evaluate(game_object)
         return [-1, -1, score]
 
     for cell in empty_cells(game_object.board):
@@ -302,7 +305,7 @@ def minimax(game_object, depth, player, alpha, beta, score):
                 game_object.board[x][y] = 1
             else:
                 game_object.board[x][y] = 0
-        current_score = minimax(game_object, depth - 1, -player, alpha, beta, score)
+        current_score = minimax(game_object, depth - 1, -player, alpha, beta)
         #print("current ", current_score)
         #print("Co-ord ",x,y)
         game_object.board[x][y] = -1
@@ -386,8 +389,8 @@ def play_fcg_cvh(side_len):
             else:
                 print("Bot's Turn")
                 # best_move = minimax(game_object,len(empty_cells(game_object.board)),bot)
-                score = 0
-                best_move = minimax(game_object, 5, bot, -infinity, infinity, score)
+                #score = 0
+                best_move = minimax(game_object, 5, bot, -infinity, infinity)
                 x, y = best_move[0], best_move[1]
                 game_object.board[x][y] = 1
                 game_object.visited[x][y] = 1
@@ -417,8 +420,8 @@ def play_fcg_cvh(side_len):
                 turn = 1
             else:
                 print("Bot's Turn")
-                score = 0
-                best_move = minimax(game_object, 5 , bot, -infinity, infinity, score)
+                #score = 0
+                best_move = minimax(game_object, 5 , bot, -infinity, infinity)
                 x, y = best_move[0], best_move[1]
                 game_object.board[x][y] = 0
                 game_object.visited[x][y] = 1
@@ -438,3 +441,4 @@ if __name__ == '__main__':
     print("You are playing against the bot")
     #game_type = int(input())
     play_fcg_cvh(side_len)
+
