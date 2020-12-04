@@ -12,7 +12,9 @@ The minimax algorithm and the corresponding functions such as evaluate, empty_ce
 https://github.com/Cledersonbc/tic-tac-toe-minimax/tree/master/py_version
 
 The heuristic evaluation of the score is done in the evaluate function where winning the game is awarded 1 point, losing the game deducts 1 point, and a draw results in 0 points.
-
+![alt text](https://github.com/siddharthshetty08/Fall20-Projects/blob/main/images/minimax1.PNG)
+<br>
+![alt text](https://github.com/siddharthshetty08/Fall20-Projects/blob/main/images/minimax2.PNG)
 ## Randomized Moves:
 Due to the long processing time of the minimax algorithm, its not feasible to run it with the complete depth. Hence, I have combined the minimax algorithm with a randomized moves funciton, which randomly plays some more moves before evaluating the final score.
 
