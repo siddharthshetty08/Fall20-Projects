@@ -11,7 +11,7 @@ The minimax algorithm is implemented to get the best moves implemented by a play
 The minimax algorithm and the corresponding functions such as evaluate, empty_cells and game over were referred from the below link. It was modified and adapted for the first capture game that is implemented in this project
 https://github.com/Cledersonbc/tic-tac-toe-minimax/tree/master/py_version
 
-The heuristic evaluation of the score is done in the evaluate function where winning the game is awarded 1 point, losing the game deducts 1 point, and a draw results in 0 points.
+The heuristic evaluation of the score is done in the evaluate function where winning the game is awarded 3 points, losing the game costs 2 points, and a draw results in -1 points.
 ![alt text](https://github.com/siddharthshetty08/Fall20-Projects/blob/main/images/minimax1.PNG)
 <br>
 ![alt text](https://github.com/siddharthshetty08/Fall20-Projects/blob/main/images/minimax2.PNG)
