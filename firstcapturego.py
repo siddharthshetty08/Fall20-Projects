@@ -1,14 +1,24 @@
 #The minimax algorithm and the corresponding functions such as evaluate, empty_cells and game over were referred from the below link.
-# It was modified and adapted for the first capture game that is implemented in this project
-#https://github.com/Cledersonbc/tic-tac-toe-minimax/blob/master/py_version/minimax.py
+#It was modified and adapted for the first capture game that is implemented in this project
+# https://github.com/Cledersonbc/tic-tac-toe-minimax/blob/master/py_version/minimax.py
 
 from math import inf as infinity
 import random
 import copy
+
 human = -1
 bot = 1
+
 class FirstCaptureGo:
+    """
+    Object of this class represents an instance of the game
+    """
     def __init__(self,side_len, is_black):
+        """
+        Initializes the board, and the colours for both players
+        :param side_len int: length of each side of the baord
+        :param is_black boolean: True if the Human player is black, False otherwise
+        """
         self.board = []
         self.visited = []
         self.prior_states = []
@@ -18,11 +28,18 @@ class FirstCaptureGo:
             for j in range(side_len):
                 self.board[i].append(-1)
                 self.visited[i].append(0)
-        print(self.board)
+        print_board(self.board)
         self.human = is_black
         self.bot = not is_black
 
 def find_adjacent_cells(x, y, side_len):
+    """
+    Finds the legal adjacent cells for a given co-ordinate (x,y)
+    :param x int: Row index
+    :param y int : Column index
+    :param side_len int: Length of each side of the baord
+    :return:
+    """
     neighbours = []
     for x_neighbour in range(x-1,x+2):
         for y_neighbour in range(y-1,y+2):
@@ -32,6 +49,12 @@ def find_adjacent_cells(x, y, side_len):
     return neighbours
 
 def get_groups(board,is_black):
+    """
+    Returns a list of lists containing groups of the opponent's pieces on the board
+    :param board: Current game state
+    :param is_black: Colour of the player
+    :return: List  consisting of groups
+    """
     groups = []
     group = []
     non_visited_group_elements = set()
@@ -89,6 +112,12 @@ def get_groups(board,is_black):
 
 
 def winning_move(board: list,is_black):
+    """
+    Checks player wins in the current board state
+    :param board list of lists: Current board state
+    :param is_black Boolean:  True if the colour of the player is black, False otherwise
+    :return Boolean: True if the player wins, False otherwise (Loss, draw or no result)
+    """
     groups = get_groups(board,is_black)
     for group in groups:
         empty_intersection = False
@@ -108,45 +137,21 @@ def winning_move(board: list,is_black):
         return False
 
 
+# Written to evaluate the rule of KO. Isn't required in First Capture go as the gamestates cannot be repeated in this case
+# def flat_board(board: list):
+#     flat_board = ""
+#     for x in board:
+#         for y in x:
+#             flat_board += str(y)
+#     return flat_board
 
-def flat_board(board: list):
-    flat_board = ""
-    for x in board:
-        for y in x:
-            flat_board += str(y)
-    return flat_board
-
-# def play_fcg(player: list):
-
-    # while True:
-    #     x = random.randint(0,len(player.board)-1)
-    #     y = random.randint(0,len(player.board)-1)
-    #     if player.visited[x][y] == 0:
-    #         player.visited[x][y] = 1
-    #         if player.is_black:
-    #             player.board[x][y] = 1
-    #             player.prior_states.append(flat_board(player.board))
-    #             win = winning_move(player.board, player.is_black)
-    #             if win:
-    #                 print("Black Player Won")
-    #                 exit()
-    #             # print(player.prior_states)
-    #             # print(player.board)
-    #             # print(player.visited)
-    #             break
-    #         else:
-    #             player.board[x][y] = 0
-    #             player.prior_states.append(flat_board(player.board))
-    #             win = winning_move(player.board, player.is_black)
-    #             if win:
-    #                 print("White Player Won")
-    #                 exit()
-    #             # print(player.prior_states)
-    #             # print(player.board)
-    #             # print(player.visited)
-    #             break
 
 def print_board(board):
+    """
+    Prints the baord
+    :param board List of lists: Current board state
+    :return:
+    """
     for row in board:
         row = ["_" if x == -1 else x for x in row]
         row = ["B" if x == 1 else x for x in row]
@@ -154,6 +159,12 @@ def print_board(board):
         print(row)
 
 def smart_play(board, is_black):
+    """
+    Returns a list of attacking positions for the player. Not Used in this code due to performance issues, needs some tuning.
+    :param board List of lists: Current board states
+    :param is_black Boolean: True if the colour of the player is black, False otherwise
+    :return:
+    """
     groups = get_groups(board, not is_black)
     possible_attack = []
     for group in groups:
@@ -167,14 +178,19 @@ def smart_play(board, is_black):
                         board[neighbour[0]][neighbour[1]] = 0
                     if not winning_move(board, not is_black):
                         possible_attack.append([neighbour[0],neighbour[1]])
-                        if len(possible_attack)==3:
-                            return possible_attack
                     board[neighbour[0]][neighbour[1]] = -1
 
     #print("smart_play")
     return possible_attack
 
 def randomized_moves(board , count, game_object):
+    """
+    Generates "count" number of random moves for both players alternately to compensate for lower depth used while calling the minimax function.
+    :param board List of lists: current board state
+    :param count int: Number of random moves required
+    :param game_object: Current game instance
+    :return List of lists: Board after the random moves are played
+    """
     possible_moves = empty_cells(board)
     turn = 1
     while count > 0 and possible_moves:
@@ -216,24 +232,38 @@ def randomized_moves(board , count, game_object):
             continue
     return board
 
-
-
 def evaluate(game_object):
+    """
+    Evaluates the scores for the current game instance
+    :param game_object Class instance: Current game instance
+    :return score int: Score based on whether its a win, loss or draw for the bot
+    """
     board = copy.deepcopy(game_object.board)
     board = randomized_moves(board, len(empty_cells(board)) ,game_object)
     if winning_move(game_object.board, game_object.bot):
-        score = 1
+        score = 3
     elif winning_move(game_object.board, game_object.human):
-        score = -1
+        score = -2
     else:
-        score = 0
+        score = -1
     return score
 
 
 def game_over(board):
+    """
+    Checks if the game is over
+    :param board List of lists: Current board state
+    :return Boolean: True if the game is over, False otherwise
+    """
     return winning_move(board, True) or winning_move(board, False)
 
 def empty_cells(board):
+    """
+    Returns the empty cells in the baord
+    :param board List of lists: Current baord state
+    :return List of lists: Empty cells in the board
+    """
+
     empty_cells = []
     for x, row in enumerate(board):
         for y, cell in enumerate(row):
@@ -241,14 +271,23 @@ def empty_cells(board):
                 empty_cells.append([x, y])
     return empty_cells
 
-def minimax(game_object, depth, player, alpha, beta):
+def minimax(game_object, depth, player, alpha, beta, score):
+    """
+    Evaluates the best move based on the minimax algorithm. Alpha beta pruning is implemented to improve the performance of the code
+    :param game_object Class instance: Current game instance
+    :param depth int: Depth until which the algorithm needs to be executed
+    :param player int: Represents the player (-1 for human and 1 for bot)
+    :param alpha int: Initially -infinity, replaced by the max score during the evaluation
+    :param beta int:  Initially +infinity, replaced by the min score during the evaluation
+    :return List: Contains the co-ordinates of the best move and the score.
+    """
     if player == bot:
         best = [-1, -1, -infinity]
     else:
         best = [-1, -1, +infinity]
 
     if depth == 0 or game_over(game_object.board):
-        score = evaluate(game_object)
+        score += evaluate(game_object)
         return [-1, -1, score]
 
     for cell in empty_cells(game_object.board):
@@ -263,7 +302,7 @@ def minimax(game_object, depth, player, alpha, beta):
                 game_object.board[x][y] = 1
             else:
                 game_object.board[x][y] = 0
-        current_score = minimax(game_object, depth - 1, -player, alpha, beta)
+        current_score = minimax(game_object, depth - 1, -player, alpha, beta, score)
         #print("current ", current_score)
         #print("Co-ord ",x,y)
         game_object.board[x][y] = -1
@@ -284,56 +323,12 @@ def minimax(game_object, depth, player, alpha, beta):
                 best = current_score  # min value
     return best
 
-# def minimax(game_object, depth, player, alpha, beta):
-#     # if player == bot:
-#     #     best = [-1, -1, -infinity]
-#     # else:
-#     #     best = [-1, -1, +infinity]
-#
-#     if depth == 0 or game_over(game_object.board):
-#         score = evaluate(game_object)
-#         return [-1, -1, score]
-#
-#     if player == bot:
-#         best_val = -infinity
-#         for cell in empty_cells(game_object.board):
-#             x, y = cell[0],cell[1]
-#             if game_object.bot:
-#                 game_object.board[x][y] = 1
-#             else:
-#                 game_object.board[x][y] = 0
-#             current_score = minimax(game_object,depth-1, -player, alpha, beta)
-#             game_object.board[x][y] = -1
-#             current_score[0] = x
-#             current_score[1] = y
-#             if current_score[2] > best_val[2]:
-#                 best_val[2] = current_score[2]
-#             alpha = max(alpha, best_val[2])
-#             if beta <= alpha:
-#                 break
-#         return  best_val
-#     else:
-#         best_val = infinity
-#         for cell in empty_cells(game_object.board):
-#             x, y = cell[0], cell[1]
-#             if game_object.human:
-#                 game_object.board[x][y] = 1
-#             else:
-#                 game_object.board[x][y] = 0
-#             current_score = minimax(game_object, depth - 1, -player, alpha, beta)
-#             game_object.board[x][y] = -1
-#             current_score[0] = x
-#             current_score[1] = y
-#             if current_score[2] < best_val[2]:
-#                 best_val[2] = current_score[2]
-#             beta = min(beta, best_val[2])
-#             if beta <= alpha:
-#                 break
-#         return best_val
-
-
-
 def get_move_input(game_object):
+    """
+    Gets input from the human
+    :param game_object: Current game instance
+    :return int: x and y co-ordinates of the human move
+    """
     while True:
         try:
             print("Enter your move in the same format as this example:")
@@ -349,6 +344,11 @@ def get_move_input(game_object):
     return x,y
 
 def play_fcg_cvh(side_len):
+    """
+    Creates and executes the First capture game between a Computer and a Human
+    :param side_len int: Length of each side of the baord
+    :return None:
+    """
     turn = 1
     #Human player gets to select the colour
     first_move = True
@@ -385,19 +385,10 @@ def play_fcg_cvh(side_len):
                 turn = 2
             else:
                 print("Bot's Turn")
-                if count < 1:
-                    while True:
-                        x = random.randint(0, len(game_object.board) - 1)
-                        y = random.randint(0, len(game_object.board) - 1)
-                        count += 1
-                        if game_object.visited[x][y] == 1:
-                            continue
-                        else:
-                            break
-                else:
-                    # best_move = minimax(game_object,len(empty_cells(game_object.board)),bot)
-                    best_move = minimax(game_object, 5, bot, -infinity, infinity)
-                    x, y = best_move[0], best_move[1]
+                # best_move = minimax(game_object,len(empty_cells(game_object.board)),bot)
+                score = 0
+                best_move = minimax(game_object, 5, bot, -infinity, infinity, score)
+                x, y = best_move[0], best_move[1]
                 game_object.board[x][y] = 1
                 game_object.visited[x][y] = 1
                 # game_object.prior_states.append(flat_board(game_object.board))
@@ -426,7 +417,8 @@ def play_fcg_cvh(side_len):
                 turn = 1
             else:
                 print("Bot's Turn")
-                best_move = minimax(game_object, 5 , bot, -infinity, infinity)
+                score = 0
+                best_move = minimax(game_object, 5 , bot, -infinity, infinity, score)
                 x, y = best_move[0], best_move[1]
                 game_object.board[x][y] = 0
                 game_object.visited[x][y] = 1
@@ -441,12 +433,8 @@ def play_fcg_cvh(side_len):
 
 
 if __name__ == '__main__':
-
-    #side_len  = input("Enter grid length")
     side_len = 5
-    #player = FirstCaptureGo(side_len)
-    while True:
-        print("Play against the bot")
-        print("Computer vs Human")
-        #game_type = int(input())
-        play_fcg_cvh(side_len)
+    print("Welcome to First Capture go (5x5)")
+    print("You are playing against the bot")
+    #game_type = int(input())
+    play_fcg_cvh(side_len)
