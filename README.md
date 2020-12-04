@@ -28,6 +28,7 @@ The evaluate function calls the randomized_moves function. Here the Loop runs un
 Class
 FirstCaptureGo:
 * Board : List of lists representing the game state
+* Visited : List of lists representing the visited cells
 * human : Boolean to represent the colour of human (True if black, False if white)
 * bot : Boolean to represent the colour of bot (True if black, False if white)
 
