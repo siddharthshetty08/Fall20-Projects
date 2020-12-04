@@ -1,6 +1,6 @@
 # Fall20-Projects
 ## First Capture GO
-In this project, a AI player is created using the minimax algorithm to play against a human player.
+In this project, a AI player is created using the minimax algorithm combined with move randomizer to play against a human player.
 The game is played in a 5x5 grid.
 It is a simple variation of the GO game, where the first player to capture opponent's stone(s) wins.
 The rule fo Ko is not applicable in this game as its impossible to repeat game states
