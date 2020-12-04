@@ -39,5 +39,7 @@ FirstCaptureGo:
 
 ## References:
 https://github.com/Cledersonbc/tic-tac-toe-minimax/tree/master/py_version
+<br>
 https://www.youtube.com/watch?v=l-hh51ncgDI&t=2s&ab_channel=SebastianLague
+<br>
 https://www.usgo.org/sites/default/files/pdf/rules_trifold.pdf
